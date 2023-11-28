@@ -1,4 +1,4 @@
-FROM ubuntu:22.04.3
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-20.04
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
