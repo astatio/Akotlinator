@@ -18,7 +18,7 @@ kotlin {
                                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.0")
                                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
                                 implementation("io.ktor:ktor-client-core:2.2.4")
-                                implementation("io.ktor:ktor-client-cio:2.2.4")
+                                implementation("io.ktor:ktor-client-cio:2.3.6")
                                 implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
                                 implementation("io.ktor:ktor-serialization-kotlinx-xml:2.3.6")
                                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
