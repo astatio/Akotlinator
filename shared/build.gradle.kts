@@ -20,7 +20,7 @@ kotlin {
                                 implementation("io.ktor:ktor-client-core:2.2.4")
                                 implementation("io.ktor:ktor-client-cio:2.3.6")
                                 implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
-                                implementation("io.ktor:ktor-serialization-kotlinx-xml:2.2.4")
+                                implementation("io.ktor:ktor-serialization-kotlinx-xml:2.3.6")
                                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
                                 implementation("com.jcabi:jcabi-xml:0.27.2")
                         }
