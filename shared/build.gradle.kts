@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
-import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
 import java.io.FileInputStream
 import java.util.*
 
