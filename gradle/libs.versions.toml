@@ -19,7 +19,7 @@ junit = "4.13.2"
 kotlinxCoroutinesCore = "1.7.3"
 kotlinxSerializationCore = "1.6.1"
 ktorClientCore = "2.3.6"
-ktorSerializationKotlinxJson = "2.2.4"
+ktorSerializationKotlinxJson = "2.3.6"
 
 [libraries]
 jcabi-xml = { module = "com.jcabi:jcabi-xml", version.ref = "jcabiXml" }
