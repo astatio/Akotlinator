@@ -4,7 +4,7 @@ import java.util.*
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    `maven-publish`
+    id("maven-publish")
 }
 
 val localProperties = Properties().apply {
@@ -25,6 +25,12 @@ kotlin {
             baseName = "Shared"
             isStatic = true
         }
+    }
+
+    linuxX64()
+    mingwX64()
+    js {
+	browser()
     }
 
     androidTarget {
