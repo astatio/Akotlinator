@@ -4,32 +4,39 @@ plugins {
 }
 
 kotlin {
-        iosX64()
-        iosArm64()
-        iosSimulatorArm64()
+        listOf(
+                iosX64(),
+                iosArm64(),
+                iosSimulatorArm64()
+        ).forEach { iosTarget ->
+                iosTarget.binaries.framework {
+                        baseName = "Shared"
+                        isStatic = true
+                }
+        }
 
-        androidTarget { compilations.all { kotlinOptions { jvmTarget = "1.8" } } }
-        jvm()
-
-        sourceSets {
-                val commonMain by getting {
-                        dependencies {
-                                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-                                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.0")
-                                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-                                implementation("io.ktor:ktor-client-core:2.2.4")
-                                implementation("io.ktor:ktor-client-cio:2.3.6")
-                                implementation("io.ktor:ktor-client-content-negotiation:2.3.6")
-                                implementation("io.ktor:ktor-serialization-kotlinx-xml:2.3.6")
-                                implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
-                                implementation("com.jcabi:jcabi-xml:0.29.0")
+        androidTarget {
+                compilations.all {
+                        kotlinOptions {
+                                jvmTarget = "1.8"
                         }
                 }
-                val commonTest by getting {
-                        dependencies {
-                                implementation(kotlin("test-common"))
-                                implementation(kotlin("test-annotations-common"))
-                        }
+        }
+
+        sourceSets {
+                commonMain.dependencies {
+                        implementation(libs.kotlinx.coroutines.core)
+                        implementation(libs.kotlinx.serialization.core)
+                        implementation(libs.kotlinx.serialization.json)
+                        implementation(libs.ktor.client.core)
+                        implementation(libs.ktor.client.cio)
+                        implementation(libs.ktor.client.content.negotiation)
+                        implementation(libs.ktor.serialization.kotlinx.xml)
+                        implementation(libs.ktor.serialization.kotlinx.json)
+                        implementation(libs.jcabi.xml)
+                }
+                commonTest.dependencies {
+                        implementation(kotlin("test"))
                 }
         }
 }
@@ -37,5 +44,7 @@ kotlin {
 android {
         namespace = "org.example.project.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
-        defaultConfig { minSdk = libs.versions.android.minSdk.get().toInt() }
+        defaultConfig {
+                minSdk = libs.versions.android.minSdk.get().toInt()
+        }
 }
