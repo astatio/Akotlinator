@@ -55,13 +55,11 @@ kotlin {
     }
     publishing {
         publications {
-            create<MavenPublication>("mavenJava") {
+            register<MavenPublication>("gpr") {
+                groupId = "org.example.project.shared"
+                artifactId = "Shared"
+                version = "1.0.0"
                 from(components["kotlin"])
-                groupId = "com.github.astatio"
-                artifactId = "akotlinator" // Replace with your artifact ID
-                version = "0.0.2" // Replace with your version
-
-                artifact("$buildDir/libs/aar/my-library-release.aar")
             }
         }
         repositories {
