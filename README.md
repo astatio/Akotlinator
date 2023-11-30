@@ -8,14 +8,14 @@ Kotlin Multiplatform API wrapper for Akinator
 
 ### Library Status
 
-| Platform         | Status        | Notes                         |
-|------------------|---------------|-------------------------------|
-| Android          | Experimental  |                               |
-| JVM              | Experimental  |                               |
-| iOS              | Experimental  |                               |
-| Linux            | Coming Soon   | Not planned for initial tests |
-| Native MacOS     | Coming Soon   | Not planned for initial tests |
-| Native Windows   | Coming Soon   | Not planned for initial tests |
+| Platform       | Status       | Notes                                        |
+|----------------|--------------|----------------------------------------------|
+| Android        | Experimental |                                              |
+| JVM            | Experimental |                                              |
+| iOS            | Experimental |                                              |
+| JS             | TBA          | Ktor CIO engine does not support this target |
+| Native MacOS   | TBA          | Not planned                                  |
+| Native Windows | TBA          | Ktor CIO engine does not support this target |
 
 
 ## Why Akotlinator when Akiwrapper exist?

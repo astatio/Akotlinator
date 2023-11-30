@@ -110,8 +110,10 @@ object Akotlinator {
     /**
      * Begins the initialization process. This will return a GameSessionInitializer object.
      *
+     *
+     * throws ClientRequestException if the request was not successful
      */
-    fun initialize(): GameSessionInitializer = GameSessionInitializer()
+    fun initialize() = GameSessionInitializer()
 
 
     private val client = HttpClient(CIO) {

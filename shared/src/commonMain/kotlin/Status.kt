@@ -1,3 +1,4 @@
+import kotlinx.serialization.Serializable
 import org.json.JSONObject
 
 @Serializable
@@ -56,7 +57,7 @@ interface Status {
 
         companion object {
             fun fromString(completion: String): Level =
-                values().find { completion.toUpperCase().startsWith(it.toString()) } ?: UNKNOWN
+                entries.find { completion.uppercase().startsWith(it.toString()) } ?: UNKNOWN
         }
     }
 

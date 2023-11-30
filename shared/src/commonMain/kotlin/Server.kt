@@ -1,9 +1,12 @@
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
 /**
  * A representation of an API server. All requests (except for
  * [Route.NEW_SESSION] are passed to an such server. Each server has a
  * predefined [Language] and [GuessType].
  */
-@Serializable
+@kotlinx.serialization.Serializable
 data class Server(
     @Transient val url: String = "", // This field has a default value
     val language: Language = Language.ENGLISH,
@@ -13,7 +16,7 @@ data class Server(
 /**
  * A language specific to a [Server].
  */
-@Serializable
+@kotlinx.serialization.Serializable
 enum class Language(val id: String) {
     ARABIC("ar"),
     CHINESE("cn"),

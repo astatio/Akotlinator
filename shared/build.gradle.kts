@@ -4,7 +4,8 @@ import java.util.*
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    id("maven-publish")
+    alias(libs.plugins.kotlinxSerialization)
+    `maven-publish`
 }
 
 val localProperties = Properties().apply {
@@ -27,12 +28,6 @@ kotlin {
         }
     }
 
-    linuxX64()
-    mingwX64()
-    js {
-	browser()
-    }
-
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -49,9 +44,10 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.xml)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.jcabi.xml)
+            implementation(libs.xml.util.core)
+            implementation(libs.xml.util.serialization)
+            implementation(libs.xml.util.serialutil)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
