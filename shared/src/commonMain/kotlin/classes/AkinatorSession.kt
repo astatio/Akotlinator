@@ -1,5 +1,6 @@
 package classes
 
+import Akinator.timeout
 import Guess
 import Language
 import MissingQuestionException
@@ -21,11 +22,10 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration
 
-abstract class AkinatorSession(
+class AkinatorSession(
     val server: Server,
     val filterProfanity: Boolean,
-    val language: Language,
-    val userId: Long
+    val language: Language
 ) {
     private val client = HttpClient {
         install(ContentNegotiation) {

@@ -117,14 +117,14 @@ object Akotlinator {
     /**
      * Begins the initialization process. This will return a GameSessionInitializer object.
      *
-     * throws ClientRequestException if the request was not successful
+     * Throws ClientRequestException if the request was not successful
      */
     fun initialize() = GameSessionInitializer()
 
     /**
      * Begins the initialization process. This will return a GameSessionInitializer object.
      *
-     * throws ClientRequestException if the request was not successful
+     * Throws ClientRequestException if the request was not successful
      */
     fun initialize(block: GameSessionInitializerBuilder.() -> Unit) = GameSessionInitializerBuilder().apply(block).build()
 
