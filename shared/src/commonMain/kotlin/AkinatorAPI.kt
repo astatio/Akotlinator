@@ -1,4 +1,7 @@
 import StatusImpl.Companion.STATUS_OK
+import classes.GameSessionInitializer
+import classes.GameSessionInitializerBuilder
+import classes.gameSessionInitializer
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.await
 import dev.minn.jda.ktx.messages.InlineEmbed
@@ -14,6 +17,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.*
+import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -31,6 +35,9 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+
+
+
 
 @Serializer(forClass = URL::class)
 object URLSerializer : KSerializer<URL> {
@@ -110,10 +117,16 @@ object Akotlinator {
     /**
      * Begins the initialization process. This will return a GameSessionInitializer object.
      *
-     *
      * throws ClientRequestException if the request was not successful
      */
     fun initialize() = GameSessionInitializer()
+
+    /**
+     * Begins the initialization process. This will return a GameSessionInitializer object.
+     *
+     * throws ClientRequestException if the request was not successful
+     */
+    fun initialize(block: GameSessionInitializerBuilder.() -> Unit) = GameSessionInitializerBuilder().apply(block).build()
 
 
     private val client = HttpClient(CIO) {
@@ -158,131 +171,7 @@ object Akotlinator {
 }
 
 
-abstract class AkinatorSession(
-    val server: Server,
-    val filterProfanity: Boolean,
-    val language: Language,
-    val timeout: Duration = Akinator.timeout,
-    val userId: Long
-) {
-    private val client = HttpClient {
-        install(ContentNegotiation) {
-            json()
-        }
-    }
 
-    private var session: Session?
-    private var currentStep: Int = 0
-    abstract var question: Question
-    private var lastInteraction: Instant = Clock.System.now()
-    private var guessCache: ConcurrentList<Guess> = mutableListOf<Guess>() as ConcurrentList<Guess>
-
-    init {
-        val questionJson = client.request<JsonObject>(
-            NEW_SESSION.createRequest(
-                "",
-                filterProfanity,
-                System.currentTimeMillis(),
-                server.url
-            )
-        )
-        val parameters = questionJson[PARAMETERS_KEY]?.jsonObject
-
-        session = getSession(parameters)
-        this.question = QuestionImpl.from(parameters?.get("step_information")?.jsonObject, STATUS_OK)
-    }
-
-    private fun getSession(parameters: JsonObject?): Session? {
-        val session = parameters?.get("identification")?.jsonObject
-        return session?.get("signature")?.jsonPrimitive?.content?.toLong()
-            ?.let { session["session"]?.jsonPrimitive?.content?.toInt()?.let { it1 -> Session(it, it1) } }
-    }
-
-
-    override fun answer(answer: Answer): Question? {
-        guessCache = emptyList<Guess>() as ConcurrentList<Guess>
-        val oldQuestion = question
-        oldQuestion?.let {
-            val newQuestionJson =
-                ANSWER.createRequest(unirest, server.getUrl(), filterProfanity, session, it.step, answer.id).getJSON()
-            try {
-                question = QuestionImpl.from(newQuestionJson.getJSONObject(PARAMETERS_KEY), StatusImpl(newQuestionJson))
-            } catch (e: MissingQuestionException) {
-                question = null
-                return null
-            }
-            currentStep += 1
-        }
-        return question
-    }
-
-    override fun undoAnswer(): Question? {
-        guessCache = emptyList<Guess>() as ConcurrentList<Guess>
-        val current = question
-        if (current == null || current.step < 1) return null
-
-        val questionJson =
-            CANCEL_ANSWER.createRequest(unirest, server.getUrl(), filterProfanity, session, current.step).getJSON()
-        question = QuestionImpl.from(questionJson.getJSONObject(PARAMETERS_KEY), StatusImpl(questionJson))
-        currentStep -= 1
-
-        return question
-    }
-
-    suspend fun getGuesses(): ConcurrentList<Guess> {
-        try {
-            if (guessCache.isEmpty()) {
-                val jsonArray =
-                    LIST.createRequest(unirest, server.getUrl(), filterProfanity, session, currentStep).getJSON()
-                        .getJSONObject(PARAMETERS_KEY).getJSONArray("elements")
-                guessCache = jsonArray.map { GuessImpl.from(it as JSONObject) }.sorted()
-            }
-            return guessCache
-        } catch (e: StatusException) {
-            if (e.status.level == Status.Level.ERROR && NO_MORE_QUESTIONS_STATUS.equals(
-                    e.status.reason,
-                    ignoreCase = true
-                )
-            ) {
-                return emptyList<Guess>() as ConcurrentList<Guess>
-            }
-            throw e
-        }
-    }
-
-
-    private fun getTimeElapsed(): Duration {
-        return Clock.System.now() - lastInteraction
-    }
-
-    var isRunning = true
-        get() = field && getTimeElapsed() < timeout
-
-    val guesses: ConcurrentLinkedQueue<Guess> = ConcurrentLinkedQueue()
-
-    private fun getGuessProbability(): Float {
-        return guess.probability
-    }
-
-    var readyToGuess = false
-        get() = field && getGuessProbability() > 0.85
-
-    fun prepareNextQuestion() {
-        //todo: get next question
-        question = Question(0.0, 0, 0.0, "test")
-    }
-
-
-    suspend fun answerAndGetNextStep(answer: Int): StepData {
-        val answerResponse = apiWrapper.answer(currentStep?.step ?: 0, answer)
-        currentStep = answerResponse.nextStep
-        return currentStep!!
-    }
-
-    fun close() { //todo: this one might need something more
-        client.close()
-    }
-}
 
 suspend fun main() {
     val language = Language.ENGLISH // You can replace this with the desired language code
@@ -306,54 +195,3 @@ suspend fun main() {
 }
 
 // This class inherits from Akotlinator
-class GameSessionInitializer {
-
-    // The language is English by default, unless provided through thenLanguagePrompt.
-    private var language = Language.ENGLISH
-    private var hasTimedout = false
-    private var userId: Long? = null
-
-
-    fun start(
-        onSuccess: (AkinatorSession) -> Unit = {},
-        onFailure: (Throwable) -> Unit
-    ): AkinatorSession? {
-        if (hasTimedout) {
-            onFailure(TimeoutException("The user didn't reply within the timeout."))
-            return null
-        }
-        if (userId == null) {
-            onFailure(IllegalStateException("The user ID is null."))
-            return null
-        }
-        val akinatorSession = AkinatorSession(
-            language = language,
-            userId = userId!!,
-        )
-        onSuccess(akinatorSession)
-        return akinatorSession
-    }
-
-    suspend fun thenLanguagePrompt(
-        trigger: Message,
-        locale: Language = Language.ENGLISH,
-        messageEmbed: (InlineEmbed) -> InlineEmbed = { it },
-    ): GameSessionInitializer {
-        trigger.replyEmbeds(messageEmbed).await()
-        val channel = trigger.channel as TextChannel
-
-
-        val interactionEvent = withTimeoutOrNull(Akinator.timeout) {
-            channel.jda.await<StringSelectInteractionEvent> {
-                (it.message.idLong == trigger.idLong) && (it.user.idLong == trigger.author.idLong)
-            }
-        }
-        if (interactionEvent == null) {
-            hasTimedout = true
-            return this
-        }
-        language = Language.valueOf(interactionEvent.values.first())
-        return this
-    }
-
-}

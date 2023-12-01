@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.util.*
 import java.util.regex.Pattern
 import javax.annotation.Nonnull
+import kotlin.jvm.JvmStatic
 
 
 class ApiKey(

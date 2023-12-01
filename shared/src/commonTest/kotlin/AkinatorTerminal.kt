@@ -4,74 +4,47 @@ import kotlin.time.Duration.Companion.minutes
 
 fun main() {
     //Start a terminal akinator session
-    println("Starting an akinator session...")
-    val akinator = Akotlinator.initialize()
-    akinator.start()
-
-
-}
-
-object Akinator {
-
-    val timeout = 1.minutes // If the user doesn't reply within this amount of time, the session ends.
-
-    suspend fun onMessageReceived(event: MessageReceivedEvent) {
-        val channel = event.channel
-
-        val akinator =
-            Akotlinator.initialize()  // Begins the initialization process. This will return a GameSessionInitializer object.
-                // The GameSessionInitializer object that as for now only one function: thenLanguagePrompt. This function requires a lambda function as a parameter.
-                // The lambda function will be called to ask the user to choose a language. This isn't mandatory as the default language is English.
-                .thenLanguagePrompt(event.message, Language.valueOf(event.guild.locale.toString())) {
-                    EmbedBuilder {
-                        title = "Akinator - Language"
-                        field {
-                            name = "Do you wish to change the language for this session?"
-                            value =
-                                "Select a language in the dropdown menu below. Select \"Default\" to use the default language."
-                        }
-                    }
-                }.start(
-                    onFailure = {
-                        // An error occurred
-                        event.message.replyEmbeds(
-                            ThrowEmbed {
-                                throwable = it
-                                text = "An error occurred while initializing the game session."
-                            }
-                        ).queue()
-                    }
-                )!!
-
-        while (akinator.isRunning) {
-            while (!akinator.readyToGuess && akinator.question.question != null) {
-                val question = akinator.question // Asks a question to the user. This will return a Question object.
-                val qMessage =event.message.replyEmbeds(
-                    Embed {
-                        title = "Akinator - Question"
-                        field {
-                            name = "Question #${question.step}"
-                            value = question.question.toString()
-                        }
-                    }
-                ).await()
-                //TODO: Need to add the buttons
-
-                // Wait for the user to answer the question
-                val answer = withTimeoutOrNull(timeout) {
-                    channel.jda.await<ButtonInteractionEvent> {
-                        (it.message.idLong == qMessage.idLong) && (it.user.idLong == qMessage.author.idLong)
-                    }
-                }
-                akinator.prepareNextQuestion()
-            }
-            if(akinator.question.question == null && akinator.guesses.isEmpty()) {
-                // Akinator ran out of questions, but couldn't guess the character.
-            }
-            while (akinator.guesses.isNotEmpty()) {
-
-            }
-            akinator.shutdown()
-        }
+    println("Welcome to Akinator in the terminal!")
+    println("Please choose a language:")
+    println("1. English")
+    println("2. Spanish")
+    var language = readln()
+    while (language.toIntOrNull() !in 1..2) {
+        println("Invalid input. Please choose a language:")
+        println("1. English")
+        println("2. Spanish")
+        language = readln()
     }
+    language = when (language.toInt()) {
+        1 -> "ENGLISH"
+        2 -> "SPANISH"
+        else -> "ENGLISH"
+    }
+    println("You chose $language.")
+    println("Do you wish to filter profanity? (y/n)")
+    var filterProfanity = readln()
+    while (filterProfanity.lowercase() !in listOf("y", "n")) {
+        println("Invalid input. Do you wish to filter profanity? (y/n)")
+        filterProfanity = readln()
+    }
+    filterProfanity = when (filterProfanity.lowercase()) {
+        "y" -> "true"
+        "n" -> "false"
+        else -> "true"
+    }
+    println("You chose $filterProfanity.")
+    println("Starting an akinator session...")
+    val akinator = Akotlinator.initialize {
+        this.language = Language.valueOf(language)
+        this.filterProfanity = filterProfanity.toBooleanStrict()
+    }
+    akinator.start(
+        onSuccess = {
+            println("Akinator session started successfully!")
+        },
+        onFailure = {
+            println("An error occurred while starting the akinator session.")
+        }
+    )
+    return
 }
