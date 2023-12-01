@@ -48,14 +48,15 @@ fun main() {
         }
     )!!
     while (akiSession.isRunning) {
-        while (!akinator.readyToGuess && akinator.question.question != null) {
-            val question = akinator.question
+        while (!akiSession.readyToGuess && akiSession.question.question != null) {
+            val question = akiSession.question
             println("Question #${question.step}: ${question.question}")
             println("0. Yes")
             println("1. No")
             println("2. Don't know")
             println("3. Probably")
             println("4. Probably not")
+            println("5. Go back a question")
             var answer = readln()
             while (answer.toIntOrNull() !in 0..4) {
                 println("Invalid input. Please choose an answer:")
@@ -64,6 +65,7 @@ fun main() {
                 println("2. Don't know")
                 println("3. Probably")
                 println("4. Probably not")
+                println("5. Go back a question")
                 answer = readln()
             }
             answer = when (answer.toInt()) {
@@ -72,12 +74,12 @@ fun main() {
                 2 -> "DONT_KNOW"
                 3 -> "PROBABLY"
                 4 -> "PROBABLY_NOT"
+                5 -> "UNDO"
                 else -> "DONT_KNOW"
             }
-            akinator
-            akinator.prepareNextQuestion()
+            akiSession.prepareNextQuestion()
         }
-        if (akinator.question.question == null && akinator.guesses.isEmpty()) {
+        if (akiSession.question.question == null && akiSession.guesses.isEmpty()) {
             println("Akinator ran out of questions, but couldn't guess the character.")
             println("Do you wish to try again? (y/n)")
             var continueSession = readln()
@@ -91,13 +93,13 @@ fun main() {
                 else -> "true"
             }
             if (continueSession.toBooleanStrict()) {
-                akinator.reset()
+                akiSession.reset()
             } else {
-                akinator.stop()
+                akiSession.stop()
             }
-        } else if (akinator.question.question == null && akinator.guesses.isNotEmpty()) {
+        } else if (akiSession.question.question == null && akiSession.guesses.isNotEmpty()) {
             println("Akinator guessed the character!")
-            println("Your character is ${akinator.guesses.first().name}.")
+            println("Your character is ${akiSession.guesses.first().name}.")
             println("Is this your character? (y/n)")
             var answer = readln()
             while (answer.lowercase() !in listOf("y", "n")) {
@@ -122,9 +124,9 @@ fun main() {
                     else -> "true"
                 }
                 if (continueSession.toBooleanStrict()) {
-                    akinator.reset()
+                    akiSession.reset()
                 } else {
-                    akinator.stop()
+                    akiSession.stop()
                 }
             } else {
                 println("I'm sorry I couldn't guess your character. Do you wish to try again? (y/n)")
@@ -139,9 +141,9 @@ fun main() {
                     else -> "true"
                 }
                 if (continueSession.toBooleanStrict()) {
-                    akinator.reset()
+                    akiSession.reset()
                 } else {
-                    akinator.stop()
+                    akiSession.stop()
                 }
             }
         }

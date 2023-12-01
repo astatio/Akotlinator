@@ -7,7 +7,6 @@ import MissingQuestionException
 import NO_MORE_QUESTIONS_STATUS
 import PARAMETERS_KEY
 import Question
-import Server
 import Session
 import StatusException
 import StatusImpl
@@ -16,6 +15,7 @@ import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.utils.io.core.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -23,7 +23,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration
 
 class AkinatorSession(
-    val server: Server,
     val filterProfanity: Boolean,
     val language: Language
 ) {
@@ -37,12 +36,18 @@ class AkinatorSession(
         }
     }
 
+    private var hasStarted = false
+
     private var session: Session?
     private var currentStep: Int = 0
-    abstract var question: Question
-    private var guessCache: ConcurrentList<Guess> = mutableListOf<Guess>() as ConcurrentList<Guess>
+    var question: Question
+    private var guessCache: MutableList<Guess> = mutableListOf()
 
     init {
+        client.use {
+            client.request(Route.NEW_SESSION
+        }
+
         val questionJson = client.request<JsonObject>(
             NEW_SESSION.createRequest(
                 "",

@@ -10,29 +10,7 @@ object Akinator {
         val channel = event.channel
 
         val akinator =
-            Akotlinator.initialize()  // Begins the initialization process. This will return a GameSessionInitializer object.
-                // The GameSessionInitializer object that as for now only one function: thenLanguagePrompt. This function requires a lambda function as a parameter.
-                // The lambda function will be called to ask the user to choose a language. This isn't mandatory as the default language is English.
-                .thenLanguagePrompt(event.message, Language.valueOf(event.guild.locale.toString())) {
-                    EmbedBuilder {
-                        title = "Akinator - Language"
-                        field {
-                            name = "Do you wish to change the language for this session?"
-                            value =
-                                "Select a language in the dropdown menu below. Select \"Default\" to use the default language."
-                        }
-                    }
-                }.start(
-                    onFailure = {
-                        // An error occurred
-                        event.message.replyEmbeds(
-                            ThrowEmbed {
-                                throwable = it
-                                text = "An error occurred while initializing the game session."
-                            }
-                        ).queue()
-                    }
-                )!!
+            Akotlinator.initialize()
 
         while (akinator.isRunning) {
             while (!akinator.readyToGuess && akinator.question.question != null) {

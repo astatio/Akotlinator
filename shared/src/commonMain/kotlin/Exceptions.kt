@@ -1,10 +1,12 @@
+import entities.Status
+
 /**
  * An exception indicating that there is no question left to answer or fetch.
  */
 class MissingQuestionException : RuntimeException()
 
 /**
- * An exception indicating that no Server could be found for the given
+ * An exception indicating that no entities.Server could be found for the given
  * combination of Language and GuessType.
  */
 class ServerNotFoundException : Exception()

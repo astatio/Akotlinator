@@ -3,7 +3,7 @@ package commands.akotlinator.utils
 import ServerNotFoundException
 import GuessType
 import Language
-import Server
+import entities.Server
 import ServerList
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -26,7 +26,7 @@ object Servers {
 
     suspend fun getServers(client: HttpClient): List<Server> {
         val listXml = fetchListXml(client)
-        // You would need to use an XML parser here to parse the listXml into a List<Server>.
+        // You would need to use an XML parser here to parse the listXml into a List<entities.Server>.
         // This is just a placeholder.
         return listOf()
     }

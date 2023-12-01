@@ -2,7 +2,6 @@ package classes
 
 import AkinatorSession
 import Language
-import kotlinx.coroutines.withTimeoutOrNull
 
 open class GameSessionInitializer(
     val language: Language = Language.ENGLISH,
@@ -18,10 +17,8 @@ open class GameSessionInitializer(
         // try to create an AkinatorSession. If it fails, call onFailure. If it succeeds, call onSuccess.
         return try {
             val session = AkinatorSession(
-                server = Server.AKINATOR,
                 filterProfanity = filterProfanity,
-                language = language,
-                userId = 0
+                language = language
             )
             onSuccess(session)
             session
