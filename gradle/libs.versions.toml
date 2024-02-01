@@ -14,7 +14,7 @@ kotlin = "2.0.0-Beta1"
 junit = "4.13.2"
 kotlinxCoroutinesCore = "1.7.3"
 kotlinxSerializationCore = "1.6.1"
-ktorClientCore = "2.3.6"
+ktorClientCore = "2.3.8"
 ktorSerializationKotlinxJson = "2.3.6"
 
 [libraries]
